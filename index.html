@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍱 Bento Menu Mingguan Lucu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bentoBg: '#FFF9F2',
+                        bentoCard: '#FFFFFF',
+                        bentoPink: '#FF85A1',
+                        bentoYellow: '#FFD166',
+                        bentoGreen: '#06D6A0',
+                        bentoBlue: '#118AB2',
+                        bentoDark: '#2B2D42',
+                        bentoOrange: '#FF9F1C'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        nunito: ['Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #FFF9F2;
+            background-image: radial-gradient(#FFD166 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .font-fredoka { font-family: 'Fredoka', sans-serif; }
+        
+        /* Custom Wobble Animation */
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+        }
+        .animate-wobble { animation: wobble 2s infinite ease-in-out; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float { animation: float 3s infinite ease-in-out; }
+
+        .bento-shadow {
+            box-shadow: 6px 6px 0px 0px #2B2D42;
+        }
+        .bento-shadow-sm {
+            box-shadow: 4px 4px 0px 0px #2B2D42;
+        }
+        .bento-shadow-pressed {
+            box-shadow: 1px 1px 0px 0px #2B2D42;
+            transform: translate(3px, 3px);
+        }
+
+        /* Checkbox Custom styling */
+        .custom-checkbox:checked + label {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 text-bentoDark">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-8 pb-4 text-center relative">
+        <div class="inline-block bg-bentoYellow border-4 border-bentoDark px-6 py-2 rounded-full bento-shadow-sm animate-wobble mb-3">
+            <span class="font-fredoka text-bentoDark font-bold tracking-wider text-sm uppercase">🍱 Special Lunch Box Menu</span>
+        </div>
+        <h1 class="font-fredoka text-4xl sm:text-5xl font-extrabold text-bentoDark drop-shadow-sm">
+            Jadwal Makan <span class="text-bentoPink">Minggu Ini</span> 😋
+        </h1>
+        <p class="text-gray-600 mt-2 font-semibold text-base sm:text-lg max-w-lg mx-auto">
+            "Jangan sampai telat makan, perut kenyang hatipun senang!" 💖
+        </p>
+
+        <!-- Action Bar -->
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
+            <button onclick="openNutritionModal()" class="bg-bentoOrange hover:bg-orange-500 text-white font-fredoka font-bold py-2.5 px-5 rounded-2xl border-3 border-bentoDark bento-shadow-sm transition-all active:bento-shadow-pressed flex items-center gap-2">
+                📊 Perincian Porsi & Nilai Gizi (Per Porsi)
+            </button>
+            <button onclick="toggleEditMode()" id="editBtn" class="bg-bentoBlue hover:bg-blue-600 text-white font-fredoka font-bold py-2.5 px-5 rounded-2xl border-3 border-bentoDark bento-shadow-sm transition-all active:bento-shadow-pressed flex items-center gap-2">
+                ✏️ Edit Menu Mingguan
+            </button>
+        </div>
+    </header>
+
+    <!-- Days Navigator (Tabs) -->
+    <nav class="max-w-4xl mx-auto px-4 my-6">
+        <div class="flex items-center justify-center gap-2 sm:gap-4 overflow-x-auto py-2">
+            <button onclick="switchDay('senin')" id="tab-senin" class="day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-bentoPink text-white scale-105">
+                Senin 🌸
+            </button>
+            <button onclick="switchDay('selasa')" id="tab-selasa" class="day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-white text-bentoDark hover:bg-amber-100">
+                Selasa ☀️
+            </button>
+            <button onclick="switchDay('rabu')" id="tab-rabu" class="day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-white text-bentoDark hover:bg-amber-100">
+                Rabu 🍀
+            </button>
+            <button onclick="switchDay('kamis')" id="tab-kamis" class="day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-white text-bentoDark hover:bg-amber-100">
+                Kamis ⚡
+            </button>
+            <button onclick="switchDay('jumat')" id="tab-jumat" class="day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-white text-bentoDark hover:bg-amber-100">
+                Jumat 🎉
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4">
+        
+        <!-- Editable Notice Banner (Hidden by default) -->
+        <div id="editBanner" class="hidden mb-6 bg-bentoYellow border-3 border-bentoDark p-4 rounded-2xl bento-shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">📝</span>
+                <p class="font-bold text-bentoDark text-sm sm:text-base">
+                    Kamu sedang dalam Mode Edit. Ubah teks langsung di kartu di bawah lalu klik Simpan!
+                </p>
+            </div>
+            <button onclick="saveMenuData()" class="bg-bentoGreen text-white font-fredoka px-4 py-2 rounded-xl border-2 border-bentoDark font-bold bento-shadow-sm hover:opacity-90">
+                💾 Simpan Menu
+            </button>
+        </div>
+
+        <!-- Bento Card Content Dynamic -->
+        <div id="bentoCardContainer" class="bg-white border-4 border-bentoDark rounded-3xl p-6 sm:p-8 bento-shadow transition-all relative overflow-hidden">
+            
+            <!-- Top Bento Header Info -->
+            <div class="flex flex-wrap items-center justify-between border-b-4 border-bentoDark pb-4 mb-6 gap-4">
+                <div>
+                    <span id="dayBadge" class="bg-bentoPink text-white font-fredoka font-bold px-3 py-1 rounded-lg border-2 border-bentoDark text-xs uppercase tracking-wider">
+                        DAY 1
+                    </span>
+                    <h2 id="dayTitle" class="font-fredoka text-3xl sm:text-4xl font-extrabold mt-1">Hari Senin</h2>
+                </div>
+                <div class="flex items-center gap-3 bg-bentoBg px-4 py-2 rounded-2xl border-2 border-bentoDark">
+                    <span class="text-2xl animate-float">🔥</span>
+                    <div>
+                        <div class="text-xs font-bold text-gray-500 uppercase">Perkiraan Energi</div>
+                        <div id="caloriesText" class="font-fredoka font-bold text-bentoOrange text-lg">~ 650 Kcal</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Box Grid Items -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Makan Siang Box -->
+                <div class="bg-[#FFF4F6] border-3 border-bentoDark rounded-2xl p-5 relative bento-shadow-sm hover:-translate-y-1 transition-transform flex flex-col justify-between">
+                    <div>
+                        <div class="absolute -top-4 left-4 bg-bentoPink text-white font-fredoka text-xs font-bold px-3 py-1 rounded-full border-2 border-bentoDark uppercase">
+                            🍱 Makan Siang (Main Lunch)
+                        </div>
+                        <div class="mt-2">
+                            <div id="lunchName" contenteditable="false" class="font-fredoka text-2xl font-bold text-bentoDark outline-none focus:bg-white focus:ring-2 focus:ring-bentoPink p-1 rounded">
+                                Nasi Ayam Serundeng + Lalapan
+                            </div>
+                            <p id="lunchDesc" contenteditable="false" cla
+							ss="text-gray-600 font-semibold mt-2 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-bentoPink p-1 rounded">
+                                Ayam goreng gurih renyah dengan serundeng kelapa wangi dan lalapan segar!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Completed Checkbox -->
+                    <div class="mt-4 pt-3 border-t-2 border-dashed border-bentoPink/40 flex items-center gap-2">
+                        <input type="checkbox" id="checkLunch" onchange="toggleEatStatus('lunch')" class="w-5 h-5 accent-bentoPink cursor-pointer custom-checkbox">
+                        <label for="checkLunch" class="font-bold text-sm text-bentoDark cursor-pointer select-none">Sudah dimakan hari ini! 😋</label>
+                    </div>
+                </div>
+
+                <!-- Foto Menu Makanan Box -->
+                <div class="bg-[#F0F9FF] border-3 border-bentoDark rounded-2xl p-5 relative bento-shadow-sm hover:-translate-y-1 transition-transform flex flex-col justify-between">
+                    <div class="absolute -top-4 left-4 bg-bentoBlue text-white font-fredoka text-xs font-bold px-3 py-1 rounded-full border-2 border-bentoDark uppercase">
+                        📸 Foto Asli Menu Makanan
+                    </div>
+                    <div class="mt-2 text-center">
+                        <div class="relative w-full h-48 sm:h-52 rounded-xl overflow-hidden border-2 border-bentoDark bg-gray-100 flex items-center justify-center">
+                            <img id="foodImage" src="images/senin.jpg" alt="Foto Menu Makanan" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/600x400/FFD166/2B2D42?text=Foto+Menu+Belum+Ada';">
+                        </div>
+                        <!-- Path Edit / Upload Input -->
+                        <div id="imageEditContainer" class="hidden mt-3 text-left">
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Path Foto / URL (Misal: images/senin.jpg):</label>
+                            <input type="text" id="imagePathInput" onchange="updateImagePath(this.value)" class="w-full text-xs p-2 border-2 border-bentoDark rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-bentoBlue" placeholder="images/senin.jpg">
+                        </div>
+                    </div>
+                    <div class="mt-2 text-center text-xs font-bold text-gray-500">
+                        📍 Foto hasil jepretan katering / masakan sendiri
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Chef Review & Quote Card -->
+            <div class="mt-6 bg-bentoYellow/30 border-3 border-bentoDark rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-bentoYellow border-2 border-bentoDark flex items-center justify-center text-2xl flex-shrink-0">
+                        👨‍🍳
+                    </div>
+                    <div>
+                        <div class="font-fredoka font-bold text-xs uppercase text-amber-800">Review Chef Hari Ini</div>
+                        <div id="chefNote" contenteditable="false" class="text-sm font-bold text-bentoDark italic outline-none focus:bg-white focus:ring-2 focus:ring-bentoYellow p-1 rounded">
+                            "Menu hari ini wajib dihabiskan! Yang nyisa denda traktir boba!"
+                        </div>
+                    </div>
+                </div>
+                <div id="ratingBadge" class="bg-white border-2 border-bentoDark font-fredoka font-bold text-xs px-3 py-1.5 rounded-xl bento-shadow-sm flex-shrink-0">
+                    ⭐ Rating Lezat: <span id="ratingStars" class="text-bentoOrange">5/5</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center mt-12 text-sm font-bold text-gray-500">
+        <p>Dibuat khusus untuk Menu Kuliner Grup WhatsApp ✨</p>
+        <p class="text-xs text-gray-400 mt-1">Buka di HP / Laptop • Data tersimpan otomatis</p>
+    </footer>
+
+    <!-- Nutrition Table Modal -->
+    <div id="nutritionModal" class="fixed inset-0 bg-bentoDark/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white border-4 border-bentoDark rounded-3xl p-6 sm:p-8 max-w-2xl w-full bento-shadow text-left relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeNutritionModal()" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full font-bold border-2 border-bentoDark">✕</button>
+            
+            <div class="flex items-center gap-3 mb-2">
+                <span class="text-3xl">📊</span>
+                <div>
+                    <h3 class="font-fredoka text-2xl font-extrabold text-bentoDark">Perincian Porsi & Nilai Gizi</h3>
+                    <p id="modalMenuName" class="text-sm font-bold text-bentoPink">Nasi Ayam Serundeng + Lalapan</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 font-semibold mb-4">Berikut adalah estimasi takaran bahan dan kandungan gizi per satu porsi hidangan:</p>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto border-2 border-bentoDark rounded-2xl">
+                <table class="w-full text-xs sm:text-sm text-left">
+                    <thead class="bg-bentoYellow text-bentoDark font-fredoka uppercase border-b-2 border-bentoDark">
+                        <tr>
+                            <th class="p-2 sm:p-3 border-r-2 border-bentoDark">Komponen / Bahan</th>
+                            <th class="p-2 sm:p-3 border-r-2 border-bentoDark">Ukuran Porsi</th>
+                            <th class="p-2 sm:p-3 border-r-2 border-bentoDark">Kalori</th>
+                            <th class="p-2 sm:p-3 border-r-2 border-bentoDark">Protein</th>
+                            <th class="p-2 sm:p-3 border-r-2 border-bentoDark">Lemak</th>
+                            <th class="p-2 sm:p-3">Karbohidrat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nutritionTableBody" class="font-bold text-gray-700 divide-y-2 divide-gray-200">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeNutritionModal()" class="bg-bentoGreen hover:bg-emerald-500 text-white font-fredoka font-bold py-2.5 px-6 rounded-xl border-2 border-bentoDark bento-shadow-sm">
+                    Tutup / Mengerti 👍
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        // Data Menu Default (Senin - Jumat)
+        const defaultMenu = {
+            senin: {
+                dayName: "Hari Senin 🌸",
+                badge: "DAY 1",
+                calories: "~ 520 Kcal",
+                lunchName: "Nasi Ayam Serundeng + Lalapan",
+                lunchDesc: "Ayam goreng gurih renyah dengan serundeng kelapa wangi dan lalapan segar!",
+                imagePath: "images/senin.jpg",
+                chefNote: "Hari Senin wajib habis! Yang ga habis denda traktir boba hari Selasa!",
+                rating: "⭐⭐⭐⭐⭐ (5/5)",
+                nutrition: [
+                    { ingredient: "Daging Ayam (Dada/Paha tanpa kulit)", portion: "1 potong (~100g)", calories: "~165 kcal", protein: "25 gram", fat: "6 gram", carbs: "0 gram" },
+                    { ingredient: "Kelapa Parut & Bumbu (Serundeng)", portion: "20 gram (sangrai)", calories: "~90 kcal", protein: "1 gram", fat: "7 gram", carbs: "5 gram" },
+                    { ingredient: "Nasi Putih", portion: "1 centong (150g)", calories: "~195 kcal", protein: "4 gram", fat: "0.5 gram", carbs: "43 gram" },
+                    { ingredient: "Lalapan (Timun, Kemangi, Kubis)", portion: "1 piring kecil (100g)", calories: "~25 kcal", protein: "1.5 gram", fat: "0.2 gram", carbs: "5 gram" },
+                    { ingredient: "Minyak (Penumis/Penggoreng)", portion: "1 sdt (5 ml)", calories: "~45 kcal", protein: "0 gram", fat: "5 gram", carbs: "0 gram" },
+                    { ingredient: "TOTAL KESELURUHAN", portion: "1 Porsi Lengkap", calories: "~520 kcal", protein: "31.5 gram", fat: "18.7 gram", carbs: "53 gram", isTotal: true }
+                ]
+            },
+            selasa: {
+                dayName: "Hari Selasa ☀️",
+                badge: "DAY 2",
+                calories: "~ 480 Kcal",
+                lunchName: "Soto Ayam Madura + Telur Rebus",
+                lunchDesc: "Kuah hangat kaya rempah dengan sohun, suwiran ayam, dan telur rebus utuh.",
+                imagePath: "images/selasa.jpg",
+                chefNote: "Kuah soto diseruput pas hangat, dijamin stres kerjaan langsung sirna!",
+                rating: "⭐⭐⭐⭐ (4.8/5)",
+                nutrition: [
+                    { ingredient: "Daging Ayam Suwir", portion: "75 gram", calories: "~120 kcal", protein: "18 gram", fat: "4.5 gram", carbs: "0 gram" },
+                    { ingredient: "Telur Rebus", portion: "1 butir (50g)", calories: "~75 kcal", protein: "6 gram", fat: "5 gram", carbs: "0.5 gram" },
+                    { ingredient: "Sohun & Taoge", portion: "50 gram", calories: "~70 kcal", protein: "1 gram", fat: "0.2 gram", carbs: "16 gram" },
+                    { ingredient: "Nasi Putih", portion: "1 centong (150g)", calories: "~195 kcal", protein: "4 gram", fat: "0.5 gram", carbs: "43 gram" },
+                    { ingredient: "TOTAL KESELURUHAN", portion: "1 Porsi Lengkap", calories: "~480 kcal", protein: "29 gram", fat: "10.2 gram", carbs: "59.5 gram", isTotal: true }
+                ]
+            },
+            rabu: {
+                dayName: "Hari Rabu 🍀",
+                badge: "DAY 3",
+                calories: "~ 550 Kcal",
+                lunchName: "Ikan Bakar Bumbu KECAP + Sayur Asem",
+                lunchDesc: "Ikan bakar manis gurih berpadu dengan kesegaran kuah sayur asem.",
+                imagePath: "images/rabu.jpg",
+                chefNote: "Hari Rabu butuh tenaga ekstra! Sambal kecap pedas manis siap nemenin.",
+                rating: "⭐⭐⭐⭐⭐ (5/5)",
+                nutrition: [
+                    { ingredient: "Ikan Nila/Gurame Bakar", portion: "1 ekor sedang (120g)", calories: "~180 kcal", protein: "24 gram", fat: "7 gram", carbs: "3 gram" },
+                    { ingredient: "Sayur Asem Segar", portion: "1 mangkuk (150g)", calories: "~80 kcal", protein: "3 gram", fat: "2 gram", carbs: "12 gram" },
+                    { ingredient: "Nasi Putih", portion: "1 centong (150g)", calories: "~195 kcal", protein: "4 gram", fat: "0.5 gram", carbs: "43 gram" },
+                    { ingredient: "Sambal & Minyak Oles", portion: "1 sdm", calories: "~95 kcal", protein: "0.5 gram", fat: "8 gram", carbs: "5 gram" },
+                    { ingredient: "TOTAL KESELURUHAN", portion: "1 Porsi Lengkap", calories: "~550 kcal", protein: "31.5 gram", fat: "17.5 gram", carbs: "63 gram", isTotal: true }
+                ]
+            },
+            kamis: {
+                dayName: "Hari Kamis ⚡",
+                badge: "DAY 4",
+                calories: "~ 510 Kcal",
+                lunchName: "Tumis Sapi Lada Hitam + Capcay",
+                lunchDesc: "Daging sapi empuk bumbu lada hitam mantap ditambah asupan gizi sayur capcay.",
+                imagePath: "images/kamis.jpg",
+                chefNote: "Protein sapi + serat sayuran biar imunitas tubuh tetap terjaga!",
+                rating: "⭐⭐⭐⭐ (4.9/5)",
+                nutrition: [
+                    { ingredient: "Daging Sapi Iris", portion: "80 gram", calories: "~170 kcal", protein: "20 gram", fat: "9 gram", carbs: "2 gram" },
+                    { ingredient: "Capcay Sayur Campur", portion: "100 gram", calories: "~75 kcal", protein: "2.5 gram", fat: "3 gram", carbs: "9 gram" },
+                    { ingredient: "Nasi Putih", portion: "1 centong (150g)", calories: "~195 kcal", protein: "4 gram", fat: "0.5 gram", carbs: "43 gram" },
+                    { ingredient: "Minyak & Bumbu Lada Hitam", portion: "1 sdm", calories: "~70 kcal", protein: "0.5 gram", fat: "6 gram", carbs: "4 gram" },
+                    { ingredient: "TOTAL KESELURUHAN", portion: "1 Porsi Lengkap", calories: "~510 kcal", protein: "27 gram", fat: "18.5 gram", carbs: "58 gram", isTotal: true }
+                ]
+            },
+            jumat: {
+                dayName: "Hari Jumat 🎉",
+                badge: "DAY 5",
+                calories: "~ 590 Kcal",
+                lunchName: "Nasi Rendang Daging + Daun Singkong",
+                lunchDesc: "Special Jumat Berkah! Rendang empuk kaya bumbu rempah asli.",
+                imagePath: "images/jumat.jpg",
+                chefNote: "Alhamdulillah Jumat Berkah! Selamat menikmati sajian spesial!",
+                rating: "⭐⭐⭐⭐⭐ (10/10)",
+                nutrition: [
+                    { ingredient: "Rendang Daging Sapi", portion: "1 potong (~80g)", calories: "~230 kcal", protein: "21 gram", fat: "14 gram", carbs: "4 gram" },
+                    { ingredient: "Rebusan Daun Singkong", portion: "80 gram", calories: "~45 kcal", protein: "3 gram", fat: "0.5 gram", carbs: "7 gram" },
+                    { ingredient: "Nasi Putih", portion: "1 centong (150g)", calories: "~195 kcal", protein: "4 gram", fat: "0.5 gram", carbs: "43 gram" },
+                    { ingredient: "Kuah Gulai & Sambal Hijau", portion: "2 sdm", calories: "~120 kcal", protein: "1 gram", fat: "11 gram", carbs: "4 gram" },
+                    { ingredient: "TOTAL KESELURUHAN", portion: "1 Porsi Lengkap", calories: "~590 kcal", protein: "29 gram", fat: "26 gram", carbs: "58 gram", isTotal: true }
+                ]
+            }
+        };
+
+        let currentDay = 'senin';
+        let isEditMode = false;
+        let menuData = {};
+
+        // Load Initial Data from LocalStorage or Default
+        function initData() {
+            const savedData = localStorage.getItem('weekly_bento_menu_v2');
+            if (savedData) {
+                menuData = JSON.parse(savedData);
+            } else {
+                menuData = JSON.parse(JSON.stringify(defaultMenu));
+            }
+            renderCard(currentDay);
+        }
+
+        // Render Card Content based on Active Day
+        function renderCard(dayKey) {
+            currentDay = dayKey;
+            const data = menuData[dayKey];
+
+            document.getElementById('dayTitle').innerText = data.dayName;
+            document.getElementById('dayBadge').innerText = data.badge;
+            document.getElementById('caloriesText').innerText = data.calories;
+
+            document.getElementById('lunchName').innerText = data.lunchName;
+            document.getElementById('lunchDesc').innerText = data.lunchDesc;
+
+            // Foto Menu
+            const imgEl = document.getElementById('foodImage');
+            imgEl.src = data.imagePath || `images/${dayKey}.jpg`;
+            document.getElementById('imagePathInput').value = data.imagePath || `images/${dayKey}.jpg`;
+
+            document.getElementById('chefNote').innerText = `"${data.chefNote}"`;
+            document.getElementById('ratingStars').innerText = data.rating;
+
+            // Load Checkbox status
+            const status = JSON.parse(localStorage.getItem(`eat_status_${dayKey}`) || '{}');
+            document.getElementById('checkLunch').checked = !!status.lunch;
+
+            // Update Tab Active Styling
+            const tabs = ['senin', 'selasa', 'rabu', 'kamis', 'jumat'];
+            const activeColors = {
+                senin: 'bg-bentoPink text-white',
+                selasa: 'bg-bentoYellow text-bentoDark',
+                rabu: 'bg-bentoGreen text-white',
+                kamis: 'bg-bentoOrange text-white',
+                jumat: 'bg-bentoBlue text-white'
+            };
+
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === dayKey) {
+                    btn.className = `day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg scale-105 ${activeColors[t]}`;
+                } else {
+                    btn.className = `day-tab px-5 py-2.5 rounded-2xl font-fredoka font-bold border-3 border-bentoDark bento-shadow-sm transition-all text-lg bg-white text-bentoDark hover:bg-amber-100`;
+                }
+            });
+        }
+
+        // Switch Day Tab
+        function switchDay(dayKey) {
+            if (isEditMode) {
+                saveMenuDataLocally();
+            }
+            renderCard(dayKey);
+        }
+
+        // Checkbox Confetti Trigger
+        function toggleEatStatus(mealType) {
+            const isLunchChecked = document.getElementById('checkLunch').checked;
+
+            localStorage.setItem(`eat_status_${currentDay}`, JSON.stringify({
+                lunch: isLunchChecked
+            }));
+
+            if (isLunchChecked) {
+                confetti({
+                    particleCount: 70,
+                    spread: 80,
+                    origin: { y: 0.7 }
+                });
+            }
+        }
+
+        // Update Image Path live
+        function updateImagePath(val) {
+            menuData[currentDay].imagePath = val;
+            document.getElementById('foodImage').src = val;
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editBanner = document.getElementById('editBanner');
+            const editBtn = document.getElementById('editBtn');
+            const imgEditContainer = document.getElementById('imageEditContainer');
+
+            const editableIds = ['lunchName', 'lunchDesc', 'chefNote'];
+
+            editableIds.forEach(id => {
+                const el = document.getElementById(id);
+                el.contentEditable = isEditMode ? "true" : "false";
+            });
+
+            if (isEditMode) {
+                editBanner.classList.remove('hidden');
+                imgEditContainer.classList.remove('hidden');
+                editBtn.innerText = "❌ Selesai Edit";
+                editBtn.classList.replace('bg-bentoBlue', 'bg-gray-600');
+            } else {
+                editBanner.classList.add('hidden');
+                imgEditContainer.classList.add('hidden');
+                editBtn.innerText = "✏️ Edit Menu Mingguan";
+                editBtn.classList.replace('bg-gray-600', 'bg-bentoBlue');
+                saveMenuData();
+            }
+        }
+
+        // Save Menu Data locally
+        function saveMenuDataLocally() {
+            menuData[currentDay].lunchName = document.getElementById('lunchName').innerText;
+            menuData[currentDay].lunchDesc = document.getElementById('lunchDesc').innerText;
+            menuData[currentDay].chefNote = document.getElementById('chefNote').innerText.replace(/^"|"$/g, '');
+            menuData[currentDay].imagePath = document.getElementById('imagePathInput').value;
+        }
+
+        function saveMenuData() {
+            saveMenuDataLocally();
+            localStorage.setItem('weekly_bento_menu_v2', JSON.stringify(menuData));
+            confetti({
+                particleCount: 100,
+                spread: 100,
+                origin: { y: 0.5 }
+            });
+            alert("✨ Perubahan berhasil disimpan!");
+        }
+
+        // Nutrition Modal Logic
+        function openNutritionModal() {
+            const modal = document.getElementById('nutritionModal');
+            const tbody = document.getElementById('nutritionTableBody');
+            const data = menuData[currentDay];
+
+            document.getElementById('modalMenuName').innerText = `${data.dayName} • ${data.lunchName}`;
+
+            tbody.innerHTML = '';
+            if (data.nutrition && data.nutrition.length > 0) {
+                data.nutrition.forEach(row => {
+                    const tr = document.createElement('tr');
+                    if (row.isTotal) {
+                        tr.className = "bg-bentoYellow/40 font-black text-bentoDark border-t-2 border-bentoDark";
+                    } else {
+                        tr.className = "hover:bg-gray-50";
+                    }
+
+                    tr.innerHTML = `
+                        <td class="p-2 sm:p-3 border-r-2 border-gray-200">${row.ingredient}</td>
+                        <td class="p-2 sm:p-3 border-r-2 border-gray-200">${row.portion}</td>
+                        <td class="p-2 sm:p-3 border-r-2 border-gray-200 text-bentoOrange">${row.calories}</td>
+                        <td class="p-2 sm:p-3 border-r-2 border-gray-200 text-bentoBlue">${row.protein}</td>
+                        <td class="p-2 sm:p-3 border-r-2 border-gray-200 text-amber-600">${row.fat}</td>
+                        <td class="p-2 sm:p-3 text-bentoGreen">${row.carbs}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeNutritionModal() {
+            document.getElementById('nutritionModal').classList.add('hidden');
+        }
+
+        // Initialize App on Load
+        window.onload = initData;
+    </script>
+</body>
+</html>
